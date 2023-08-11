@@ -36,7 +36,7 @@ jobs:
 
       - name: Mirror main to private repo
         run: |
-          remote_repo="https://fcooper8472:${{ secrets.DEPLOY_ACCESS_TOKEN_PRIVATE }}@github.com/fcooper8472/private-test.git"
+          remote_repo="https://fcooper8472:${{ secrets.DEPLOY_ACCESS_TOKEN }}@github.com/fcooper8472/private-test.git"
           git fetch "${remote_repo}" main
           if ! git diff --quiet HEAD FETCH_HEAD; then
             git push "${remote_repo}" HEAD:main --follow-tags --force
