@@ -1,0 +1,43 @@
+name: Sync
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  private-to-public:
+    if: github.repository == 'fcooper8472/private-test'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout private repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Mirror main to public repo
+        run: |
+          remote_repo="https://fcooper8472:${{ secrets.DEPLOY_ACCESS_TOKEN }}@github.com/fcooper8472/public-test.git"
+          git fetch "${remote_repo}" main
+          if ! git diff --quiet HEAD FETCH_HEAD; then
+            git push "${remote_repo}" HEAD:main --follow-tags --force
+          fi
+
+  public-to-private:
+    if: github.repository == 'fcooper8472/public-test'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout public repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Mirror main to private repo
+        run: |
+          remote_repo="https://fcooper8472:${{ secrets.DEPLOY_ACCESS_TOKEN_PRIVATE }}@github.com/fcooper8472/private-test.git"
+          git fetch "${remote_repo}" main
+          if ! git diff --quiet HEAD FETCH_HEAD; then
+            git push "${remote_repo}" HEAD:main --follow-tags --force
+          fi
